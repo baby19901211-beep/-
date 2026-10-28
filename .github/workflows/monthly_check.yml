@@ -1,0 +1,31 @@
+name: Monthly Safety Regulation Checker
+
+on:
+  schedule:
+    # 每月 1 號 台灣時間上午 8:00 (UTC 時間 0:00) 自動執行
+    - cron: '0 0 1 * *'
+  workflow_dispatch: # 允許你隨時手動點擊按鈕測試執行
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Regulation Check
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
+          RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
+        python check_regulations.py
